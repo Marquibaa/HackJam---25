@@ -58,7 +58,11 @@ export default function LoginForm() {
                         </div>
 
                         <div style={{ marginTop: 12 }}>
-                            <RunawaySignInButton onSuccessfulClick={performSubmit} />
+                            <RunawaySignInButton 
+                            onSuccessfulClick={performSubmit} 
+                            disabled={!canSubmit()}
+/>
+
                         </div>
                     </div>
                 </div>
