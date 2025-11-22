@@ -53,14 +53,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+    backgroundColor: 'rgba(251, 251, 251, 0.7)', 
     zIndex: 1000, 
     // The overlay covers the whole screen, but we don't center the content here,
     // as the inner 'popup' element handles its own positioning.
   },
   popup: {
     position: 'absolute', // Crucial: Allows us to set top/left properties
-    backgroundColor: '#ffdddd', 
+    backgroundColor: '#e4e4e4ff', 
     padding: '30px',
     borderRadius: '10px',
     boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5)',
