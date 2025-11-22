@@ -22,7 +22,8 @@ export default function RunawaySignInButton({ onSuccessfulClick, disabled = fals
 
     // Move the button away from the cursor. Accepts an optional event but doesn't require it.
     function runAway(e?: any) {
-        if (disabled) return; // always respect disabled
+        // Only run away while in the "active" fun period and when not disabled
+        if (!active || disabled) return;
 
         // If we have the button element and a mouse event, try to move away from cursor
         if (e && btnRef.current) {
