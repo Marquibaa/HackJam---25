@@ -42,10 +42,6 @@ export default function LoginForm() {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 12 }}>
-                    <RunawaySignInButton onSuccessfulClick={performSubmit} />
-                </div>
-
                 <hr />
 
                 <div>
@@ -59,6 +55,10 @@ export default function LoginForm() {
                         <div>
                             <strong>Morse Input</strong>
                             <MorseInput />
+                        </div>
+
+                        <div style={{ marginTop: 12 }}>
+                            <RunawaySignInButton onSuccessfulClick={performSubmit} />
                         </div>
                     </div>
                 </div>
