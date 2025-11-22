@@ -102,7 +102,7 @@ export default function Username({ value, onChange }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ fontWeight: 600 }}>
                 Username (enter in Morse)
-                <a href="./assets/morse.pdf" style={{ marginLeft: 8 }}>termo</a>
+                <a href="/morse.pdf" target="_blank" rel="noopener noreferrer">termo</a>
             </label>
 
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
