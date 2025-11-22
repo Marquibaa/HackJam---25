@@ -8,10 +8,8 @@ export default function Captcha() {
     const pegRadius = 4
     const startY = 20
     const bottomMargin = 60
-    // bucket layout (left = Yes smaller, right = No larger)
     const bucketGap = width * 0.03
-    // choose widths so they don't overlap but right remains larger
-    const leftBucketWidth = width * 0.25
+    const leftBucketWidth = width * 0.3
     const rightBucketWidth = width * 0.625
     const leftBucketX = bucketGap
     const rightBucketX = width - bucketGap - rightBucketWidth
@@ -28,7 +26,6 @@ export default function Captcha() {
     const startX = width / 2
 
     useEffect(() => {
-        // initial ball resting position
         setBallPos({ x: startX, y: startY })
     }, [])
 
@@ -37,19 +34,13 @@ export default function Captcha() {
         let x = startX
         for (let r = 0; r < rows; r++) {
             const y = startY + (r + 0.5) * rowGap
-            // choose left or right at each row
-            // small bias toward the right (No) but not overwhelming
-            const dir = Math.random() < 0.46 ? -1 : 1
-            // horizontal shift magnitude: about half spacing plus small jitter
+            const dir = Math.random() < 0.5 ? -1 : 1
             const shift = (pegSpacingX / 2) * dir + (Math.random() - 0.5) * 6
             x = Math.max(12, Math.min(width - 12, x + shift))
             path.push({ x, y })
         }
-        // final landing position somewhere in bottom area
         const finalY = height - 30
-        // add a couple intermediate points toward bottom
         path.push({ x: x + (Math.random() - 0.5) * 10, y: height - bottomMargin / 2 })
-        // small centered drift so final x is not strongly pushed right
         const drift = (Math.random() - 0.5) * 0.08 * width
         const finalX = Math.max(12, Math.min(width - 12, x + drift))
         path.push({ x: finalX, y: finalY })
@@ -66,7 +57,6 @@ export default function Captcha() {
         let raf = 0
         function step(now: number) {
             const t = Math.min(1, (now - start) / totalDuration)
-            // map t to position along piecewise linear path
             const seg = t * (path.length - 1)
             const idx = Math.floor(seg)
             const frac = seg - idx
@@ -79,14 +69,11 @@ export default function Captcha() {
             if (t < 1) {
                 raf = requestAnimationFrame(step)
             } else {
-                // finished
                 setAnimating(false)
-                // determine bucket using the actual bucket rectangles
                 let res: string | null = null
                 if (x >= leftBucketX && x <= leftBucketX + leftBucketWidth) res = 'Yes'
                 else if (x >= rightBucketX && x <= rightBucketX + rightBucketWidth) res = 'No'
                 else {
-                    // fallback: choose nearest bucket center
                     const leftCenter = leftBucketX + leftBucketWidth / 2
                     const rightCenter = rightBucketX + rightBucketWidth / 2
                     res = Math.abs(x - leftCenter) < Math.abs(x - rightCenter) ? 'Yes' : 'No'
@@ -104,19 +91,15 @@ export default function Captcha() {
 
     function releaseBall() {
         if (animating) return
-        // ensure ball is at the top before starting
         setResult(null)
         setVerified(false)
         setBallPos({ x: startX, y: startY })
         const path = buildPath()
-        // replace any previous path
         pathRef.current = path
-        // ensure the effect sees the change: toggle animating in next frame
         setAnimating(false)
         requestAnimationFrame(() => setAnimating(true))
     }
 
-    // Helper to immediately reset and start a new release (reliable, no timeouts)
     function tryAgain() {
         if (animating) return
         setResult(null)
@@ -124,12 +107,10 @@ export default function Captcha() {
         setBallPos({ x: startX, y: startY })
         const path = buildPath()
         pathRef.current = path
-        // ensure a fresh animating toggle so the useEffect picks up the new path
         setAnimating(false)
         requestAnimationFrame(() => setAnimating(true))
     }
 
-    // Primary button behavior: acts as Release / Try again (if No) / Reset (if Yes)
     function primaryButtonAction() {
         if (animating) return
         if (result === 'No') {
@@ -137,11 +118,9 @@ export default function Captcha() {
             return
         }
         if (result === 'Yes') {
-            // just reset so user can play again
             reset()
             return
         }
-        // default: release
         releaseBall()
     }
 
@@ -150,11 +129,9 @@ export default function Captcha() {
         setResult(null)
         setVerified(false)
         setBallPos({ x: startX, y: startY })
-        // clear any planned path so a stale path cannot resume
         pathRef.current = []
     }
 
-    // draw pegs grid
     const pegs: Array<{ x: number; y: number }> = []
     for (let r = 0; r < rows; r++) {
         const offset = (r % 2) * (pegSpacingX / 2)
@@ -172,21 +149,17 @@ export default function Captcha() {
             {!verified ? (
                 <>
                     <svg width={width} height={height} style={{ background: '#ffffffb3', borderRadius: 6 }}>
-                        {/* pegs */}
                         {pegs.map((p, i) => (
                             <circle key={i} cx={p.x} cy={p.y} r={pegRadius} fill="#000000ff" />
                         ))}
 
-                        {/* buckets (left = Yes smaller & neutral/uncolored) */}
                         <rect x={leftBucketX} y={height - bottomMargin + 6} width={leftBucketWidth} height={bucketHeight} fill="none" stroke="#94a3b8" />
                         <rect x={rightBucketX} y={height - bottomMargin + 6} width={rightBucketWidth} height={bucketHeight} fill="none" stroke="#94a3b8" />
                         <text x={leftBucketX + leftBucketWidth / 2} y={height - bottomMargin / 2 + 2} textAnchor="middle" fontSize={14} fill="#000000ff">Yes</text>
                         <text x={rightBucketX + rightBucketWidth / 2} y={height - bottomMargin / 2 + 2} textAnchor="middle" fontSize={14} fill="#000000ff">No</text>
 
-                        {/* dividing line */}
                         <line x1={divideX} y1={height - bottomMargin} x2={divideX} y2={height} stroke="#000000ff" />
 
-                        {/* ball */}
                         {ballPos && (
                             <circle cx={ballPos.x} cy={ballPos.y} r={10} fill="#f59e0b" stroke="#b45309" />
                         )}
