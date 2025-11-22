@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// 1. IMPORT THE IMAGE: The path is relative from src/components/ to src/assets/
+import React, { useState, useEffect, useRef } from 'react';
 import annoyingImage from '../assets/imagepopup.jpg'; 
 
 interface AnnoyingPopupProps {
@@ -7,43 +6,40 @@ interface AnnoyingPopupProps {
 }
 
 const AnnoyingPopup: React.FC<AnnoyingPopupProps> = ({ onClose }) => {
-  const [positionStyle, setPositionStyle] = useState({});
+  const popupRef = useRef<HTMLDivElement>(null);
+  const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 });
 
-  // Function to calculate a random position
-  const calculateRandomPosition = () => {
-    // Generate random values for top and left percentages (5% to 85%)
-    const randomTop = Math.floor(Math.random() * 80) + 5; 
-    const randomLeft = Math.floor(Math.random() * 80) + 5; 
-
-    return {
-      top: `${randomTop}%`,
-      left: `${randomLeft}%`,
-      // Centers the element based on its own dimensions
-      transform: 'translate(-50%, -50%)', 
-    };
-  };
-
-  // Set the random position when the component mounts (when it appears)
   useEffect(() => {
-    setPositionStyle(calculateRandomPosition());
-  }, []); 
+    if (!popupRef.current) return;
 
-  // Merge the calculated random position with the fixed base styles
-  const mergedPopupStyle = { ...styles.popup, ...positionStyle };
-  
+    const popupWidth = popupRef.current.offsetWidth;
+    const popupHeight = popupRef.current.offsetHeight;
+
+    // Prevent going out of screen
+    const maxLeft = window.innerWidth - popupWidth;
+    const maxTop = window.innerHeight - popupHeight;
+
+    const randomLeft = Math.random() * maxLeft;
+    const randomTop = Math.random() * maxTop;
+
+    setPositionStyle({
+      top: randomTop,
+      left: randomLeft
+    });
+  }, []);
+
   return (
     <div style={styles.overlay}> 
-      <div style={mergedPopupStyle}>
+      <div ref={popupRef} style={{ ...styles.popup, ...positionStyle }}>
         
-        {/* 2. USE THE IMAGE: Insert the img tag */}
         <img 
             src={annoyingImage} 
             alt="Critical Warning" 
             style={styles.popupImage} 
         />
         
+        {/* YOUR SAME TEXT — UNCHANGED */}
         <h3>🛑 ATTENTION! This is a completely necessary pop-up that you must close to continue. Enjoy your stay!</h3>
-        
         
         <button onClick={onClose} style={styles.closeButton}>
             I Understand (But I'm Still Annoyed)
@@ -53,7 +49,7 @@ const AnnoyingPopup: React.FC<AnnoyingPopupProps> = ({ onClose }) => {
   );
 };
 
-// Basic CSS styles
+// Styles
 const styles: { [key: string]: React.CSSProperties } = {
   overlay: {
     position: 'fixed',
@@ -65,8 +61,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     zIndex: 1000, 
   },
   popup: {
-    position: 'absolute', // Allows random top/left positioning
-    backgroundColor: '#ffffffff', // Annoying light red color
+    position: 'absolute',
+    backgroundColor: '#ffffffff',
     padding: '30px',
     borderRadius: '10px',
     boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5)',
@@ -75,13 +71,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '90%',
     border: '5px solid red',
     color: 'darkred',
+
+    // 🚨 IMPORTANT CHANGE: removed translate(-50%, -50%)
   },
-  popupImage: { // 3. STYLE THE IMAGE
+  popupImage: { 
     width: '300px', 
     height: 'auto', 
     margin: '0 auto 15px auto', 
-    display: 'block', 
-    // You can add annoying CSS here, like a flashing border
+    display: 'block',
     border: '3px solid yellow', 
   },
   closeButton: {
