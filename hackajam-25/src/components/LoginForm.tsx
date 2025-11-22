@@ -1,13 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // ADDED useEffect
 import Username from './Username'
 import Password from './Password'
 import Captcha from './captcha'
 import RunawaySignInButton from './RunawaySingInButton'
+import AnnoyingPopup from './AnnoyingPopup'; // ADDED AnnoyingPopup
 
 export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [captchaVerified, setCaptchaVerified] = useState(false)
+    
+    // ADDED: State for pop-up visibility
+    const [isPopupVisible, setIsPopupVisible] = useState(false); 
+
+    // ADDED: Timer logic to show pop-up every 10 seconds
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setIsPopupVisible(true);
+        }, 10000); 
+        return () => clearInterval(intervalId);
+    }, []); 
+
+    // ADDED: Handler to hide the pop-up
+    const handleClosePopup = () => {
+        setIsPopupVisible(false);
+    };
 
     const performSubmit = () => {
         if (!canSubmit()) return
@@ -55,6 +72,10 @@ export default function LoginForm() {
                     </div>
                 </form>
             </div>
+            
+            {/* ADDED: Conditionally render the pop-up */}
+            {isPopupVisible && <AnnoyingPopup onClose={handleClosePopup} />}
+            
         </div>
     );
 }
