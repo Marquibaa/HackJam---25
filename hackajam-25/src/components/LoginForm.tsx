@@ -22,7 +22,7 @@ export default function LoginForm() {
 
     return (
         <div style={{ padding: 20 }}>
-            <h1>Main Login</h1>
+            <h1>Login</h1>
             <form onSubmit={submit} style={{ display: 'grid', gap: 12, maxWidth: 700 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center' }}>
                     <div>
