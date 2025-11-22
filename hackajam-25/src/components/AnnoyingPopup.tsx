@@ -36,8 +36,7 @@ const AnnoyingPopup: React.FC<AnnoyingPopupProps> = ({ onClose }) => {
   return (
     <div style={styles.overlay}> 
       <div style={mergedPopupStyle}>
-        <h3>🛑 New Error! Location: {positionStyle.top} {positionStyle.left}</h3>
-        <p>This critical alert requires immediate attention, wherever it may be!</p>
+        <h3>🛑 Attention! A new message has arrived! This is a completely necessary pop-up that you must close to continue. Enjoy your stay!</h3>
         <button onClick={onClose} style={styles.closeButton}>
           Dismiss and Find Me Again Later
         </button>
