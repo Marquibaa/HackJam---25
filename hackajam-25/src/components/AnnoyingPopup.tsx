@@ -66,7 +66,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   popup: {
     position: 'absolute', // Allows random top/left positioning
-    backgroundColor: '#ffdddd', // Annoying light red color
+    backgroundColor: '#ffffffff', // Annoying light red color
     padding: '30px',
     borderRadius: '10px',
     boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5)',
@@ -77,7 +77,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: 'darkred',
   },
   popupImage: { // 3. STYLE THE IMAGE
-    width: '120px', 
+    width: '300px', 
     height: 'auto', 
     margin: '0 auto 15px auto', 
     display: 'block', 
