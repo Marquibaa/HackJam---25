@@ -1,18 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-type Props = {
-    onSuccessfulClick?: () => void
-}
-
-// This component is specifically styled as the Sign In button
-export default function RunawaySignInButton({ onSuccessfulClick = () => {} }: Props) {
-    const [pos, setPos] = useState({ top: 0, left: 0 }); // Start relative to parent
+export default function RunawaySignInButton({ onSuccessfulClick }) {
+    const initialPos = useRef({ top: 0, left: 0 }); // Save starting point
+    const [pos, setPos] = useState({ top: 0, left: 0 });
     const [active, setActive] = useState(true);
 
     useEffect(() => {
-        // Stop the runaway effect after 10 seconds (10000ms)
         const timer = setTimeout(() => {
             setActive(false);
+
+            // ⬅️ When runaway mode ends, restore ORIGINAL position
+            setPos(initialPos.current);
         }, 10000);
 
         return () => clearTimeout(timer);
@@ -21,32 +19,29 @@ export default function RunawaySignInButton({ onSuccessfulClick = () => {} }: Pr
     function runAway() {
         if (!active) return;
 
-        // The button moves within a boundary (e.g., 200px offset from center)
-        // We use Math.random() - 0.5 to allow negative and positive movement
         setPos({
-            top: (Math.random() - 0.5) * 150, // Move max 75px up/down from center
-            left: (Math.random() - 0.5) * 250, // Move max 125px left/right from center
+            top: (Math.random() - 0.5) * 150,
+            left: (Math.random() - 0.5) * 250,
         });
     }
 
     return (
         <button
-            type="button" // Use type="button" to prevent default form submission on click
+            type="button"
             onMouseEnter={runAway}
             onClick={() => {
-                // Only trigger success callback when the runaway effect has ended
-                if (!active) onSuccessfulClick()
+                if (!active && onSuccessfulClick) {
+                    onSuccessfulClick();
+                }
             }}
             style={{
-                position: "relative", // Changed from "absolute" for better inline flow
-                // Use transform to apply position changes relative to the starting point
-                transform: `translate(${pos.left}px, ${pos.top}px)`, 
-                transition: "transform 0.2s ease-out", 
-                marginLeft: 8, // Added margin for spacing consistency
+                position: "relative",
+                transform: `translate(${pos.left}px, ${pos.top}px)`,
+                transition: "transform 0.2s ease-out",
+                marginLeft: 8,
                 padding: "8px 16px",
                 cursor: active ? "not-allowed" : "pointer",
-                // A little extra visual annoyance
-                boxShadow: active ? "0 0 5px red" : "none", 
+                boxShadow: active ? "0 0 5px red" : "none",
                 fontWeight: "bold",
             }}
         >
