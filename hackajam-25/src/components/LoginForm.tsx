@@ -1,36 +1,13 @@
-import { useState, useEffect } from 'react'; // <-- ADDED useEffect
+import { useState } from 'react';
 import Username from './Username'
 import Password from './Password'
 import Captcha from './captcha'
 import RunawaySignInButton from './RunawaySingInButton'
-import AnnoyingPopup from './AnnoyingPopup'; // <-- IMPORT the Pop-up Component
 
 export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordValid, setPasswordValid] = useState(false);
     const [captchaVerified, setCaptchaVerified] = useState(false)
-    
-    // 1. POP-UP STATE: State to control the annoying pop-up visibility
-    const [isPopupVisible, setIsPopupVisible] = useState(false); 
-
-    // 2. POP-UP TIMER LOGIC: Effect to handle the 10-second interval
-    useEffect(() => {
-        const showPopup = () => {
-            setIsPopupVisible(true);
-        };
-
-        // Set the interval to show the pop-up every 10 seconds (10000ms)
-        const intervalId = setInterval(showPopup, 10000);
-
-        // Cleanup function: essential to clear the interval when the component unmounts
-        return () => clearInterval(intervalId);
-    }, []); // Runs only once on mount
-
-    // 3. POP-UP CLOSE HANDLER
-    const handleClosePopup = () => {
-        setIsPopupVisible(false);
-    };
 
     const performSubmit = () => {
         if (!canSubmit()) return
@@ -39,8 +16,7 @@ export default function LoginForm() {
     }
 
     function canSubmit() {
-        // require username, non-empty password, captcha, and inverse-match validity
-        return username.trim() !== '' && password.trim() !== '' && captchaVerified && passwordValid
+        return username.trim() !== '' && password.trim() !== '' && captchaVerified
     }
 
     return (
@@ -57,7 +33,7 @@ export default function LoginForm() {
                 >
                     <Username value={username} onChange={setUsername} />
 
-                    <Password value={password} onChange={setPassword} onValidChange={setPasswordValid} />
+                    <Password value={password} onChange={setPassword} />
 
                     <div>
                         <Captcha onValidChange={setCaptchaVerified} />
@@ -79,10 +55,6 @@ export default function LoginForm() {
                     </div>
                 </form>
             </div>
-            
-            {/* 4. RENDER POP-UP: Renders when isPopupVisible is true */}
-            {isPopupVisible && <AnnoyingPopup onClose={handleClosePopup} />}
-            
         </div>
     );
 }
