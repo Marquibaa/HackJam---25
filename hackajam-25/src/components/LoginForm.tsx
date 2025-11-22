@@ -7,7 +7,8 @@ import RunawaySignInButton from './RunawaySingInButton'
 export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    
+    const [captchaValid, setCaptchaValid] = useState(false);
+    const [morseValid, setMorseValid] = useState(false);
 
     const performSubmit = () => {
         if (!canSubmit()) return
@@ -15,9 +16,8 @@ export default function LoginForm() {
         alert('Form submitted successfully!')
     }
 
-    function canSubmit() {
-        return username.trim() !== '' && password.trim() !== ''
-    }
+    // Check if all requirements are met
+    const canSubmit = username.trim() !== '' && password.trim() !== '' && captchaValid && morseValid;
 
     return (
         <div style={{ padding: 20, display: 'flex', justifyContent: 'center' }}>
@@ -35,20 +35,26 @@ export default function LoginForm() {
 
                     <Password value={password} onChange={setPassword} />
 
-                    <div>
-                        <Captcha />
-                    </div>
+                {/* Captcha */}
+                <div>
+                    <h3>Captcha</h3>
+                    <Captcha onValidChange={setCaptchaValid} />
+                </div>
 
-                    {/* Morse is handled inside Username */}
+                {/* Morse Input */}
+                <div>
+                    <h3>Morse Input</h3>
+                    <MorseInput onValidChange={setMorseValid} />
+                </div>
 
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <RunawaySignInButton onSuccessfulClick={performSubmit} disabled={!canSubmit()} />
-                        <button type="button" onClick={resetForm} style={{ padding: '8px 12px', borderRadius: 6 }}>
-                            Reset
-                        </button>
-                    </div>
-                </form>
-            </div>
+                {/* Sign In Button */}
+                <div style={{ marginTop: 12 }}>
+                    <RunawaySignInButton
+                        onSuccessfulClick={performSubmit}
+                        disabled={!canSubmit} // disabled until all requirements are met
+                    />
+                </div>
+            </form>
         </div>
     );
 }
