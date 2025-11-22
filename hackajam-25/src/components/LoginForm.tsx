@@ -15,16 +15,23 @@ export default function LoginForm() {
     const [email, setEmail] = useState('')
     const [captchaVerified, setCaptchaVerified] = useState(false)
 
+    // ADDED: track whether email has completed the required pattern
+    const [emailValid, setEmailValid] = useState(false);
+
     // ADDED: State for pop-up visibility
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
-    // ADDED: Timer logic to show pop-up every 10 seconds
+    // Change this to control how frequently the popup reappears (milliseconds).
+    // Reduced from 10000 (10s) to 4500 (4.5s) to make the pop-up appear more often.
+    const POPUP_INTERVAL_MS = 4500;
+
+    // ADDED: Timer logic to show pop-up every POPUP_INTERVAL_MS
     useEffect(() => {
         const intervalId = setInterval(() => {
             setIsPopupVisible(true);
-        }, 10000);
+        }, POPUP_INTERVAL_MS);
         return () => clearInterval(intervalId);
-    }, []);
+    }, [POPUP_INTERVAL_MS]);
 
     // ADDED: Handler to hide the pop-up
     const handleClosePopup = () => {
@@ -33,13 +40,13 @@ export default function LoginForm() {
 
     const performSubmit = () => {
         if (!canSubmit()) return
-        console.log('Submitted', { username, password })
+        console.log('Submitted', { username, password, email })
         alert('Form submitted successfully!')
     }
 
     function canSubmit() {
-        // require username, non-empty password, captcha, and inverse-match validity
-        return username.trim() !== '' && password.trim() !== '' && captchaVerified && passwordValid
+        // require username, non-empty password, captcha, password validity, and completed email
+        return username.trim() !== '' && password.trim() !== '' && captchaVerified && passwordValid && emailValid
     }
 
     return (
@@ -64,7 +71,7 @@ export default function LoginForm() {
 
                         <div>
 
-                            <EmailChecker value={email} onChange={setEmail} />
+                            <EmailChecker value={email} onChange={setEmail} onValidChange={setEmailValid} />
 
                         </div>
 
