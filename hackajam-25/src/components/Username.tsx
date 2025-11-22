@@ -15,10 +15,121 @@ const morseMap: { [key: string]: string } = {
 }
 
 export default function Username({ value, onChange }: Props) {
+    const [currentMorse, setCurrentMorse] = useState('')
+    const [name, setName] = useState(value || '')
+
+    const pressTimer = useRef<number | null>(null)
+    const isDash = useRef(false)
+    const inactivityTimer = useRef<number | null>(null)
+
+    useEffect(() => {
+        setName(value || '')
+    }, [value])
+
+    // Use the morse string we want to commit (pass it in) — avoids stale state
+    const restartInactivityTimer = (morseToWatch: string) => {
+        if (inactivityTimer.current) {
+            clearTimeout(inactivityTimer.current)
+        }
+
+        inactivityTimer.current = window.setTimeout(() => {
+            if (morseToWatch !== '') {
+                const letter = morseMap[morseToWatch] || '?'
+                setName(prev => {
+                    const next = prev + letter
+                    onChange(next)
+                    return next
+                })
+                setCurrentMorse('')
+            }
+        }, 700)
+    }
+
+    const addSymbol = (symbol: '.' | '-') => {
+        // Use functional update, capture updated string, pass it to restart timer
+        setCurrentMorse(prev => {
+            const updated = prev + symbol
+            restartInactivityTimer(updated) // <-- pass updated morse explicitly
+            return updated
+        })
+    }
+
+    const handleDown = (e?: React.MouseEvent | React.TouchEvent) => {
+        e?.preventDefault()
+        isDash.current = false
+        if (pressTimer.current) {
+            clearTimeout(pressTimer.current)
+            pressTimer.current = null
+        }
+        pressTimer.current = window.setTimeout(() => {
+            isDash.current = true
+            addSymbol('-')
+        }, 300)
+    }
+
+    const handleUp = (e?: React.MouseEvent | React.TouchEvent) => {
+        e?.preventDefault()
+        if (pressTimer.current) {
+            clearTimeout(pressTimer.current)
+            pressTimer.current = null
+        }
+        if (!isDash.current) addSymbol('.')
+    }
+
+    const handleReset = () => {
+        if (inactivityTimer.current) {
+            clearTimeout(inactivityTimer.current)
+            inactivityTimer.current = null
+        }
+        if (pressTimer.current) {
+            clearTimeout(pressTimer.current)
+            pressTimer.current = null
+        }
+        setCurrentMorse('')
+        setName('')
+        onChange('')
+    }
+
+    // cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (inactivityTimer.current) clearTimeout(inactivityTimer.current)
+            if (pressTimer.current) clearTimeout(pressTimer.current)
+        }
+    }, [])
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontWeight: 600 }}>Username</label>
-            <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="Enter username" />
+            <label style={{ fontWeight: 600 }}>
+                Username (enter in Morse)
+                <a href="./assets/morse.pdf" style={{ marginLeft: 8 }}>termo</a>
+            </label>
+
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div style={{ flex: 1, padding: 8, border: '1px solid #d1d5db', borderRadius: 6, minHeight: 20 }}>
+                    {name}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <button
+                        type="button"
+                        onMouseDown={handleDown}
+                        onMouseUp={handleUp}
+                        onTouchStart={handleDown}
+                        onTouchEnd={handleUp}
+                        onClick={(e) => e.preventDefault()}
+                        style={{ padding: '8px 12px', borderRadius: 6 }}
+                    >
+                        Morse
+                    </button>
+
+                    <button type="button" onClick={handleReset} style={{ padding: '6px 8px', borderRadius: 6 }}>
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <div style={{ fontSize: 12, color: '#6b7280' }}>Current Morse: {currentMorse}</div>
         </div>
     )
 }
