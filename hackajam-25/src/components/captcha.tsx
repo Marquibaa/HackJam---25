@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function Captcha() {
+type Props = {
+    onValidChange?: (v: boolean) => void
+}
+
+export default function Captcha({ onValidChange }: Props) {
     const width = 320
     const height = 420
     const rows = 8
@@ -81,6 +85,10 @@ export default function Captcha() {
                 setResult(res)
                 if (res === 'Yes') {
                     setVerified(true)
+                    if (onValidChange) onValidChange(true)
+                } else {
+                    setVerified(false)
+                    if (onValidChange) onValidChange(false)
                 }
             }
         }
@@ -93,6 +101,7 @@ export default function Captcha() {
         if (animating) return
         setResult(null)
         setVerified(false)
+        if (onValidChange) onValidChange(false)
         setBallPos({ x: startX, y: startY })
         const path = buildPath()
         pathRef.current = path
@@ -104,6 +113,7 @@ export default function Captcha() {
         if (animating) return
         setResult(null)
         setVerified(false)
+        if (onValidChange) onValidChange(false)
         setBallPos({ x: startX, y: startY })
         const path = buildPath()
         pathRef.current = path
@@ -128,6 +138,7 @@ export default function Captcha() {
         setAnimating(false)
         setResult(null)
         setVerified(false)
+        if (onValidChange) onValidChange(false)
         setBallPos({ x: startX, y: startY })
         pathRef.current = []
     }
@@ -143,8 +154,8 @@ export default function Captcha() {
     }
 
     return (
-        <div style={{ padding: 12, border: '1px solid #eee', borderRadius: 8, width: width }}>
-            <h4 style={{ margin: '4px 0' }}>Are you human?</h4>
+        <div style={{ padding: 12, border: '1px solid #eee', borderRadius: 8, width: width, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <h4 style={{ margin: '4px 0', textAlign: 'center' }}>Are you human?</h4>
 
             {!verified ? (
                 <>

@@ -7,7 +7,7 @@ import RunawaySignInButton from './RunawaySingInButton'
 export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    
+    const [captchaVerified, setCaptchaVerified] = useState(false)
 
     const performSubmit = () => {
         if (!canSubmit()) return
@@ -16,7 +16,7 @@ export default function LoginForm() {
     }
 
     function canSubmit() {
-        return username.trim() !== '' && password.trim() !== ''
+        return username.trim() !== '' && password.trim() !== '' && captchaVerified
     }
 
     return (
@@ -36,13 +36,19 @@ export default function LoginForm() {
                     <Password value={password} onChange={setPassword} />
 
                     <div>
-                        <Captcha />
+                        <Captcha onValidChange={setCaptchaVerified} />
                     </div>
 
                     {/* Morse is handled inside Username */}
 
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <RunawaySignInButton onSuccessfulClick={performSubmit} disabled={!canSubmit()} />
+                        {canSubmit() ? (
+                            <RunawaySignInButton onSuccessfulClick={performSubmit} disabled={false} />
+                        ) : (
+                            <button type="button" disabled style={{ padding: '8px 14px', borderRadius: 6, opacity: 0.6 }}>
+                                Sign in (locked)
+                            </button>
+                        )}
                         <button type="button" onClick={resetForm} style={{ padding: '8px 12px', borderRadius: 6 }}>
                             Reset
                         </button>
