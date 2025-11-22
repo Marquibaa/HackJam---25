@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import './morse.css'
 
 const morseMap: { [key: string]: string } = {
     ".-": "A",
@@ -33,30 +32,41 @@ const morseMap: { [key: string]: string } = {
 export default function MorseFirstName() {
     const [currentMorse, setCurrentMorse] = useState("");
     const [firstName, setFirstName] = useState("");
-    const timerRef = useRef<number | null>(null);
-    const dashAdded = useRef(false);
+
+    const pressTimer = useRef<number | null>(null);
+    const isDash = useRef(false);
+    const inactivityTimer = useRef<number | null>(null);
+
+    // Auto-commit letter on inactivity
+    const startInactivityTimer = () => {
+        if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+
+        inactivityTimer.current = window.setTimeout(() => {
+            if (currentMorse !== "") {
+                const letter = morseMap[currentMorse] || "?";
+                setFirstName((prev) => prev + letter);
+                setCurrentMorse("");
+            }
+        }, 700);
+    };
 
     const handleMouseDown = () => {
-        dashAdded.current = false;
-        timerRef.current = window.setTimeout(() => {
+        isDash.current = false;
+
+        pressTimer.current = window.setTimeout(() => {
+            isDash.current = true;
             setCurrentMorse((prev) => prev + "-");
-            dashAdded.current = true;
-        }, 300); // Hold >300ms means dash
+        }, 300);
     };
 
     const handleMouseUp = () => {
-        if (timerRef.current) clearTimeout(timerRef.current);
+        if (pressTimer.current) clearTimeout(pressTimer.current);
 
-        // If no dash was added by long press, add a dot
-        if (!dashAdded.current) {
+        if (!isDash.current) {
             setCurrentMorse((prev) => prev + ".");
         }
-    };
 
-    const commitLetter = () => {
-        const letter = morseMap[currentMorse] || "?"; // evil fallback
-        setFirstName((prev) => prev + letter);
-        setCurrentMorse(""); // reset buffer
+        startInactivityTimer();
     };
 
     const resetAll = () => {
@@ -65,37 +75,28 @@ export default function MorseFirstName() {
     };
 
     return (
-        <div className="flex flex-col items-center gap-4 p-6">
-            <h1 className="text-xl font-bold">Enter Your First Name (Morse Only)</h1>
+        <div className="">
+            <h1 className="">Annoying Morse First Name Input</h1>
 
-            <div className="text-center">
-                <div>
+            <div className="">
+                <div className="">
                     <strong>First Name:</strong> {firstName}
                 </div>
-                <div>
+
+                <div className="">
                     <strong>Current Morse:</strong> {currentMorse}
                 </div>
             </div>
 
             <button
+                className=""
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
-                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
             >
-                Tap = Dot • Hold = Dash
+                Tap = Dot • Hold = Dash • Pause = Next Letter
             </button>
 
-            <button
-                onClick={commitLetter}
-                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
-            >
-                Commit Letter
-            </button>
-
-            <button
-                onClick={resetAll}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
-            >
+            <button className="" onClick={resetAll}>
                 Reset
             </button>
         </div>
