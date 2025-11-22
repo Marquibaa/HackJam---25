@@ -1,24 +1,26 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function RunawaySignInButton({ onSuccessfulClick }) {
-    const initialPos = useRef({ top: 0, left: 0 }); // Save starting point
+interface RunawaySignInButtonProps {
+    onSuccessfulClick: () => void;
+    disabled?: boolean; // new prop
+}
+
+export default function RunawaySignInButton({ onSuccessfulClick, disabled = false }: RunawaySignInButtonProps) {
+    const initialPos = useRef({ top: 0, left: 0 });
     const [pos, setPos] = useState({ top: 0, left: 0 });
     const [active, setActive] = useState(true);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setActive(false);
-
-            // ⬅️ When runaway mode ends, restore ORIGINAL position
-            setPos(initialPos.current);
+            setPos(initialPos.current); // restore position
         }, 10000);
 
         return () => clearTimeout(timer);
     }, []);
 
     function runAway() {
-        if (!active) return;
-
+        if (!active || disabled) return; // Stop running away if disabled
         setPos({
             top: (Math.random() - 0.5) * 150,
             left: (Math.random() - 0.5) * 250,
@@ -30,7 +32,7 @@ export default function RunawaySignInButton({ onSuccessfulClick }) {
             type="button"
             onMouseEnter={runAway}
             onClick={() => {
-                if (!active && onSuccessfulClick) {
+                if (!active && !disabled && onSuccessfulClick) {
                     onSuccessfulClick();
                 }
             }}
@@ -40,9 +42,10 @@ export default function RunawaySignInButton({ onSuccessfulClick }) {
                 transition: "transform 0.2s ease-out",
                 marginLeft: 8,
                 padding: "8px 16px",
-                cursor: active ? "not-allowed" : "pointer",
-                boxShadow: active ? "0 0 5px red" : "none",
+                cursor: active || disabled ? "not-allowed" : "pointer",
+                boxShadow: active || disabled ? "0 0 5px red" : "none",
                 fontWeight: "bold",
+                opacity: disabled ? 0.6 : 1, // visually indicate disabled
             }}
         >
             {active ? "Sign In: GET ME!" : "Sign In"}
