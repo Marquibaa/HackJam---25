@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function AnnoyingPassword() {
-    const [password, setPassword] = useState("");
+interface PasswordProps {
+    value: string;
+    onChange: (v: string) => void;
+    onValidChange?: (valid: boolean) => void;
+}
+
+export default function AnnoyingPassword({ value, onChange, onValidChange }: PasswordProps) {
     const [confirm, setConfirm] = useState("");
     const [message, setMessage] = useState("");
+    const [isValid, setIsValid] = useState(false);
 
     const checkPasswords = (pw: string, cf: string) => {
         if (pw === "" || cf === "") {
             setMessage("");
+            setIsValid(false);
             return;
         }
 
@@ -16,14 +23,26 @@ export default function AnnoyingPassword() {
         if (cf === pw) {
             // They typed the same forward (wrong)
             setMessage("Second password should be typed backwards.");
+            setIsValid(false);
         } else if (cf !== reversed) {
             // Still wrong, but not matching pw → mismatch
-            setMessage("Passwords do not match.");
+            setMessage("Passwords do not INVERSELY match.");
+            setIsValid(false);
         } else {
             // They typed the reversed password correctly
             setMessage("Correct! (finally)");
+            setIsValid(true);
         }
     };
+
+    useEffect(() => {
+        checkPasswords(value, confirm);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value, confirm]);
+
+    useEffect(() => {
+        if (onValidChange) onValidChange(isValid);
+    }, [isValid, onValidChange]);
 
     return (
         <div className="password-container">
@@ -32,12 +51,8 @@ export default function AnnoyingPassword() {
                 <input
                     type="password"
                     className="password-input"
-                    value={password}
-                    onChange={(e) => {
-                        const pw = e.target.value;
-                        setPassword(pw);
-                        checkPasswords(pw, confirm);
-                    }}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
                 />
             </div>
 
@@ -47,11 +62,7 @@ export default function AnnoyingPassword() {
                     type="password"
                     className="password-input"
                     value={confirm}
-                    onChange={(e) => {
-                        const cf = e.target.value;
-                        setConfirm(cf);
-                        checkPasswords(password, cf);
-                    }}
+                    onChange={(e) => setConfirm(e.target.value)}
                 />
             </div>
 

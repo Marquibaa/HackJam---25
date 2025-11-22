@@ -8,6 +8,7 @@ import AnnoyingPopup from './AnnoyingPopup'; // <-- IMPORT the Pop-up Component
 export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordValid, setPasswordValid] = useState(false);
     const [captchaVerified, setCaptchaVerified] = useState(false)
     
     // 1. POP-UP STATE: State to control the annoying pop-up visibility
@@ -38,7 +39,8 @@ export default function LoginForm() {
     }
 
     function canSubmit() {
-        return username.trim() !== '' && password.trim() !== '' && captchaVerified
+        // require username, non-empty password, captcha, and inverse-match validity
+        return username.trim() !== '' && password.trim() !== '' && captchaVerified && passwordValid
     }
 
     return (
@@ -55,7 +57,7 @@ export default function LoginForm() {
                 >
                     <Username value={username} onChange={setUsername} />
 
-                    <Password value={password} onChange={setPassword} />
+                    <Password value={password} onChange={setPassword} onValidChange={setPasswordValid} />
 
                     <div>
                         <Captcha onValidChange={setCaptchaVerified} />
