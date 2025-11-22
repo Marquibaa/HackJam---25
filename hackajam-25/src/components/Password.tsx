@@ -74,9 +74,9 @@ export default function AnnoyingPassword({ value, onChange, onValidChange }: Pas
             <h3>Create Your Password (Shooting Game)</h3>
 
             <p className="instructions">
-                Click inside the box.  
-                Move with <strong>PgUp/PgDn</strong> or <strong>Arrow Up/Down</strong>.  
-                Shoot with <strong>End</strong> or <strong>Right Arrow</strong>.  
+                Click inside the box.
+                Move with <strong>PgUp/PgDn</strong> or <strong>Arrow Up/Down</strong>.
+                Shoot with <strong>End</strong> or <strong>Right Arrow</strong>.
                 <br />
                 <strong>Goal:</strong> At least <strong>8 letters</strong> and <strong>5 numbers</strong>.
             </p>
@@ -94,6 +94,7 @@ export default function AnnoyingPassword({ value, onChange, onValidChange }: Pas
                     padding: "8px",
                     borderRadius: "6px",
                     maxWidth: "320px",
+                    margin: "0 auto",     // ← centers the game box
                     marginBottom: "12px"
                 }}
             >

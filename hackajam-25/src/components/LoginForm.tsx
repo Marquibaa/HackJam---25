@@ -14,17 +14,17 @@ export default function LoginForm() {
     const [passwordValid, setPasswordValid] = useState(false);
     const [email, setEmail] = useState('')
     const [captchaVerified, setCaptchaVerified] = useState(false)
-    
+
     // ADDED: State for pop-up visibility
-    const [isPopupVisible, setIsPopupVisible] = useState(false); 
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
 
     // ADDED: Timer logic to show pop-up every 10 seconds
     useEffect(() => {
         const intervalId = setInterval(() => {
             setIsPopupVisible(true);
-        }, 10000); 
+        }, 10000);
         return () => clearInterval(intervalId);
-    }, []); 
+    }, []);
 
     // ADDED: Handler to hide the pop-up
     const handleClosePopup = () => {
@@ -56,23 +56,23 @@ export default function LoginForm() {
                 >
                     <Username value={username} onChange={setUsername} />
 
-                    <Password value={password} onChange={setPassword} onValidChange={setPasswordValid} />
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                        <Password value={password} onChange={setPassword} onValidChange={setPasswordValid} />
+                    </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center' }}>
 
-			         <div>
+                        <div>
 
-			            <EmailChecker value={email} onChange={setEmail} />
+                            <EmailChecker value={email} onChange={setEmail} />
 
-			         </div>
+                        </div>
 
-			            <div style={{ alignSelf: 'start' }}>
+                        <div style={{ alignSelf: 'start' }}>
 
-			                 <div style={{ fontSize: 12, color: '#666' }}>Put ur email here buddy boy</div>
+                        </div>
 
-			            </div>
-
-			     </div>
+                    </div>
 
                     <div>
                         <Captcha onValidChange={setCaptchaVerified} />
@@ -94,10 +94,10 @@ export default function LoginForm() {
                     </div>
                 </form>
             </div>
-            
+
             {/* ADDED: Conditionally render the pop-up */}
             {isPopupVisible && <AnnoyingPopup onClose={handleClosePopup} />}
-            
+
         </div>
     );
 }
