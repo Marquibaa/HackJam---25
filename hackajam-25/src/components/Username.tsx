@@ -26,18 +26,15 @@ export default function Username({ value, onChange }: Props) {
         setName(value || '')
     }, [value])
 
-    // Use the morse string we want to commit (pass it in) — avoids stale state
     const restartInactivityTimer = (morseToWatch: string) => {
-        if (inactivityTimer.current) {
-            clearTimeout(inactivityTimer.current)
-        }
+        if (inactivityTimer.current) clearTimeout(inactivityTimer.current)
 
         inactivityTimer.current = window.setTimeout(() => {
             if (morseToWatch !== '') {
                 const letter = morseMap[morseToWatch] || '?'
                 setName(prev => {
                     const next = prev + letter
-                    onChange(next)
+                    if (next.length >= 5) onChange(next)
                     return next
                 })
                 setCurrentMorse('')
@@ -46,10 +43,9 @@ export default function Username({ value, onChange }: Props) {
     }
 
     const addSymbol = (symbol: '.' | '-') => {
-        // Use functional update, capture updated string, pass it to restart timer
         setCurrentMorse(prev => {
             const updated = prev + symbol
-            restartInactivityTimer(updated) // <-- pass updated morse explicitly
+            restartInactivityTimer(updated)
             return updated
         })
     }
@@ -57,10 +53,8 @@ export default function Username({ value, onChange }: Props) {
     const handleDown = (e?: React.MouseEvent | React.TouchEvent) => {
         e?.preventDefault()
         isDash.current = false
-        if (pressTimer.current) {
-            clearTimeout(pressTimer.current)
-            pressTimer.current = null
-        }
+        if (pressTimer.current) clearTimeout(pressTimer.current)
+
         pressTimer.current = window.setTimeout(() => {
             isDash.current = true
             addSymbol('-')
@@ -69,28 +63,18 @@ export default function Username({ value, onChange }: Props) {
 
     const handleUp = (e?: React.MouseEvent | React.TouchEvent) => {
         e?.preventDefault()
-        if (pressTimer.current) {
-            clearTimeout(pressTimer.current)
-            pressTimer.current = null
-        }
+        if (pressTimer.current) clearTimeout(pressTimer.current)
         if (!isDash.current) addSymbol('.')
     }
 
     const handleReset = () => {
-        if (inactivityTimer.current) {
-            clearTimeout(inactivityTimer.current)
-            inactivityTimer.current = null
-        }
-        if (pressTimer.current) {
-            clearTimeout(pressTimer.current)
-            pressTimer.current = null
-        }
+        if (inactivityTimer.current) clearTimeout(inactivityTimer.current)
+        if (pressTimer.current) clearTimeout(pressTimer.current)
         setCurrentMorse('')
         setName('')
         onChange('')
     }
 
-    // cleanup on unmount
     useEffect(() => {
         return () => {
             if (inactivityTimer.current) clearTimeout(inactivityTimer.current)
@@ -102,7 +86,9 @@ export default function Username({ value, onChange }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ fontWeight: 600 }}>
                 Username (enter in Morse)
-                <a href="/morse.pdf" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}> Morse Table</a>
+                <a href="/morse.pdf" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', marginLeft: 4 }}>
+                    Morse Table
+                </a>
             </label>
 
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -124,7 +110,14 @@ export default function Username({ value, onChange }: Props) {
                     </button>
                 </div>
             </div>
+
             <div style={{ fontSize: 12, color: '#6b7280' }}>Current Morse: {currentMorse}</div>
+
+            {name.length > 0 && name.length < 5 && (
+                <div style={{ textAlign: 'center', color: 'red', fontWeight: 600, marginTop: 4 }}>
+                    Minimum of 5 characters
+                </div>
+            )}
 
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
                 <button
@@ -135,7 +128,8 @@ export default function Username({ value, onChange }: Props) {
                     Clear
                 </button>
             </div>
-
         </div>
     )
+
+
 }
