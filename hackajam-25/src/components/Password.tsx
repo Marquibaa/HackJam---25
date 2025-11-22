@@ -21,15 +21,12 @@ export default function AnnoyingPassword({ value, onChange, onValidChange }: Pas
         const reversed = pw.split("").reverse().join("");
 
         if (cf === pw) {
-            // They typed the same forward (wrong)
             setMessage("Second password should be typed backwards.");
             setIsValid(false);
         } else if (cf !== reversed) {
-            // Still wrong, but not matching pw → mismatch
             setMessage("Passwords do not INVERSELY match.");
             setIsValid(false);
         } else {
-            // They typed the reversed password correctly
             setMessage("Correct! (finally)");
             setIsValid(true);
         }

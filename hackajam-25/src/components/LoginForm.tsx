@@ -4,10 +4,15 @@ import Password from './Password'
 import Captcha from './captcha'
 import RunawaySignInButton from './RunawaySingInButton'
 import AnnoyingPopup from './AnnoyingPopup'; // ADDED AnnoyingPopup
+import EmailChecker from './Email'
+
+
 
 export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordValid, setPasswordValid] = useState(false);
+    const [email, setEmail] = useState('')
     const [captchaVerified, setCaptchaVerified] = useState(false)
     
     // ADDED: State for pop-up visibility
@@ -33,7 +38,8 @@ export default function LoginForm() {
     }
 
     function canSubmit() {
-        return username.trim() !== '' && password.trim() !== '' && captchaVerified
+        // require username, non-empty password, captcha, and inverse-match validity
+        return username.trim() !== '' && password.trim() !== '' && captchaVerified && passwordValid
     }
 
     return (
@@ -50,7 +56,23 @@ export default function LoginForm() {
                 >
                     <Username value={username} onChange={setUsername} />
 
-                    <Password value={password} onChange={setPassword} />
+                    <Password value={password} onChange={setPassword} onValidChange={setPasswordValid} />
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center' }}>
+
+			         <div>
+
+			            <EmailChecker value={email} onChange={setEmail} />
+
+			         </div>
+
+			            <div style={{ alignSelf: 'start' }}>
+
+			                 <div style={{ fontSize: 12, color: '#666' }}>Put ur email here buddy boy</div>
+
+			            </div>
+
+			     </div>
 
                     <div>
                         <Captcha onValidChange={setCaptchaVerified} />
