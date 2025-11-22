@@ -1,46 +1,23 @@
-import { useState, useEffect } from 'react'; // <-- ADDED useEffect
+import { useState } from 'react';
 import Username from './Username'
 import Password from './Password'
 import Captcha from './captcha'
-import MorseInput from './MorseInput'; // Assuming this is your Morse component
 import RunawaySignInButton from './RunawaySingInButton'
-import AnnoyingPopup from './AnnoyingPopup'; // <-- IMPORT the Pop-up Component
 
 export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [captchaValid, setCaptchaValid] = useState(false);
-    const [morseValid, setMorseValid] = useState(false);
-    
-    // <-- NEW: State to control the annoying pop-up visibility
-    const [isPopupVisible, setIsPopupVisible] = useState(false); 
-
-    // Logic to show the pop-up every 10 seconds
-    useEffect(() => {
-        const showPopup = () => {
-            setIsPopupVisible(true);
-        };
-
-        // Set the interval to show the pop-up every 10 seconds (10000ms)
-        const intervalId = setInterval(showPopup, 10000);
-
-        // Cleanup function: essential to clear the interval when the component unmounts
-        return () => clearInterval(intervalId);
-    }, []); // Runs only once on mount
-
-    // Handler to hide the pop-up when the user closes it
-    const handleClosePopup = () => {
-        setIsPopupVisible(false);
-    };
+    const [captchaVerified, setCaptchaVerified] = useState(false)
 
     const performSubmit = () => {
-        if (!canSubmit) return
+        if (!canSubmit()) return
         console.log('Submitted', { username, password })
         alert('Form submitted successfully!')
     }
 
-    // Check if all requirements are met
-    const canSubmit = username.trim() !== '' && password.trim() !== '' && captchaValid && morseValid;
+    function canSubmit() {
+        return username.trim() !== '' && password.trim() !== '' && captchaVerified
+    }
 
     return (
         <div style={{ padding: 20, display: 'flex', justifyContent: 'center' }}>
@@ -58,32 +35,26 @@ export default function LoginForm() {
 
                     <Password value={password} onChange={setPassword} />
 
-                    {/* Captcha */}
                     <div>
-                        <h3>Captcha</h3>
-                        <Captcha onValidChange={setCaptchaValid} />
+                        <Captcha onValidChange={setCaptchaVerified} />
                     </div>
 
-                    {/* Morse Input */}
-                    <div>
-                        <h3>Morse Input</h3>
-                        <MorseInput onValidChange={setMorseValid} />
-                    </div>
+                    {/* Morse is handled inside Username */}
 
-                    {/* Sign In Button */}
-                    <div style={{ marginTop: 12 }}>
-                        <RunawaySignInButton
-                            onSuccessfulClick={performSubmit}
-                            disabled={!canSubmit} // disabled until all requirements are met
-                        />
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        {canSubmit() ? (
+                            <RunawaySignInButton onSuccessfulClick={performSubmit} disabled={false} />
+                        ) : (
+                            <button type="button" disabled style={{ padding: '8px 14px', borderRadius: 6, opacity: 0.6 }}>
+                                Sign in (locked)
+                            </button>
+                        )}
+                        <button type="button" onClick={resetForm} style={{ padding: '8px 12px', borderRadius: 6 }}>
+                            Reset
+                        </button>
                     </div>
                 </form>
             </div>
-            
-            {/* 💥 THE ANNOYING POP-UP 💥 */}
-            {/* Renders when isPopupVisible is true, and passes the close handler */}
-            {isPopupVisible && <AnnoyingPopup onClose={handleClosePopup} />}
-            
         </div>
     );
 }
